@@ -10,9 +10,9 @@ namespace cms.core.Interface.Repository
     public interface IpostRepository
     {
         Task<List<Post>> GetAll();
-        List<Post> GetPostbyid(int id);
-        int add (Post post);
-        Post edit (Post post);
+        Task<List<Post>> GetPostbyid(int id);
+        Task<int> add (Post post);
+        Task<Post> edit (Post post,int postid);
         void delete (int id);
 
     }

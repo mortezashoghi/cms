@@ -1,4 +1,5 @@
-﻿using cms.core.Interface.Repository;
+﻿using Azure.Core;
+using cms.core.Interface.Repository;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -15,7 +16,7 @@ namespace cms.Infrastructure.Data.Repositoreis
 
         public async Task<List<core.Domain.Post>> GetAll()
         {
-            return await( _cmsdbcontext.posts.Select(p => new core.Domain.Post
+            return await _cmsdbcontext.posts.Select(p => new core.Domain.Post
             {
                 Id = p.Id,
                 title = p.title,
@@ -25,12 +26,12 @@ namespace cms.Infrastructure.Data.Repositoreis
                 userid = p.userid,
                 Createddate = p.Createddate,
                 Updateddate = p.Updateddate
-            }).ToListAsync());
+            }).ToListAsync();
         }
 
-        public List<core.Domain.Post> GetPostbyid(int id)
+        public async  Task<List<core.Domain.Post>> GetPostbyid(int id)
         {
-            return _cmsdbcontext.posts.Where(p => p.Id == id).Select(p => new core.Domain.Post
+            return await _cmsdbcontext.posts.Where(p => p.Id == id).Select(p => new core.Domain.Post
             {
                 Id = p.Id,
                 title = p.title,
@@ -40,10 +41,10 @@ namespace cms.Infrastructure.Data.Repositoreis
                 userid=p.userid,
                 Createddate = p.Createddate,
                 Updateddate = p.Updateddate
-            }).ToList();
+            }).ToListAsync();
         }
 
-        public int add(core.Domain.Post post)
+        public async Task<int> add(core.Domain.Post post)
         {
             var postmodel = new Infrastructure.Data.Entities.Post { 
                 Id = post.Id,
@@ -55,20 +56,32 @@ namespace cms.Infrastructure.Data.Repositoreis
                 Createddate = post.Createddate,
                 Updateddate = post.Updateddate
                 };
-            _cmsdbcontext.posts.Add(postmodel);
-            _cmsdbcontext.SaveChanges();
+             _cmsdbcontext.posts.Add(postmodel);
+             _cmsdbcontext.SaveChanges();
             return postmodel.Id;
 
         }
 
-        public core.Domain.Post edit(core.Domain.Post post)
+        public async Task<core.Domain.Post> edit(core.Domain.Post post,int pid)
         {
-            throw new NotImplementedException();
-        }
+            //throw new NotImplementedException();
+            var _post = await _cmsdbcontext.posts.FindAsync(pid);
+            if (_post == null)
+                throw new NotImplementedException();
 
-        public void delete(int id)
+            _post.title = post.title;
+            _post.categoryid = post.categoryid;
+            _post.Author = post.Author;
+            _post.Createddate = post.Createddate;
+            _post.Updateddate = post.Updateddate;   
+            _post.userid = post.userid;
+            _cmsdbcontext.posts.Update(_post);
+            await _cmsdbcontext.SaveChangesAsync();
+            return post;
+        }
+        public async void delete(int id)
         {
-            throw new NotImplementedException();
+            await _cmsdbcontext.posts.Where(p => p.Id == id).ExecuteDeleteAsync();
         }
     }
 }

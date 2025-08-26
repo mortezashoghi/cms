@@ -9,11 +9,11 @@ namespace cms.core.Interface.Repository
 {
     public interface IcategoryRepository
     {
-        Category GetCategory(int id);
-        Category GetCategory(string categoryName);
-        List<Category> GetAllCategories();
-        int add(Category category);
-        Category edit(Category category);
+        Task<Category> GetCategory(int id);
+        Task<Category> GetCategory(string categoryName);
+        Task<List<Category>> GetAllCategories();
+        Task<int> add(Category category);
+        Task<Category> edit(Category category, int cid);
         void delete(int id);
 
 
